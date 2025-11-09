@@ -1,0 +1,54 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Ajouter un document PDF</h4>
+                </div>
+                <div class="card-body">
+                    <form id="formAjout" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="information" class="form-label">Information associée *</label>
+                            <select class="form-control" id="information" name="information" required>
+                                <option value="">Sélectionnez une information</option>
+                            </select>
+                            <div class="invalid-feedback" data-champ="information"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date du document *</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                            <div class="invalid-feedback" data-champ="date"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre du document *</label>
+                            <input type="text" class="form-control" id="titre" name="titre"
+                                   minlength="3" maxlength="255" required>
+                            <div class="form-text">Entre 3 et 255 caractères</div>
+                            <div class="invalid-feedback" data-champ="titre"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nomFichier" class="form-label">Fichier PDF *</label>
+                            <div class="groupe-fichier">
+                                <button type="button" id="btnFichier" class="btn btn-outline-secondary">
+                                    📁 Choisir un fichier
+                                </button>
+                                <span id="nomFichier" class="texte-muted ms-2"></span>
+                            </div>
+                            <input type="file" id="fichier" accept=".pdf" style="display: none">
+                            <div class="form-text">Fichier PDF uniquement, 512 Ko maximum</div>
+                            <div class="invalid-feedback" data-champ="fichier"></div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="listedocument.php" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="button" id="btnAjouter" class="btn btn-primary">Ajouter le document</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

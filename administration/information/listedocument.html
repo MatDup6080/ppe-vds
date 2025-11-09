@@ -1,0 +1,28 @@
+<div class="formulaire" style="max-width: 800px; margin-left: 10px; margin-top:35px">
+    <h3 class="text-center">Liste des documents</h3>
+    <div id="msg"></div>
+
+    <!-- Indicateur de filtre -->
+    <div id="filtre-info" style="display: none;" class="alert alert-info mb-3">
+        Affichage des documents pour l'information : <strong id="nom-information"></strong>
+        <a href="listedocument.php" class="btn btn-sm btn-outline-secondary ms-3">Voir tous les documents</a>
+        <a href="document.php?idInformation=<?php echo $idInformation; ?>" class="btn btn-sm btn-outline-secondary ms-3">Ajouter documents</a>
+
+    </div>
+      <!-- Liste des documents -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th width="30px"></th>
+            <th>Nom du document</th>
+        </tr>
+        </thead>
+        <tbody id="lesLignes"></tbody>
+        </table>
+
+    <!-- Message quand aucun document -->
+    <div id="message-aucun-document" style="display: none;" class="text-center text-muted mt-4">
+
+    </div>
+    <a href="../information/" class="btn btn-secondary me-md-2">retour</a>
+</div>

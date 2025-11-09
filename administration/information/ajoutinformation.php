@@ -9,13 +9,23 @@ if (!isset($_SESSION['membre'])) {
 }
 
 $titre = "Ajout d'une information";
-$lesParametres = json_encode(Information::getConfig());
 
-$head =<<<HTML
-    <script>
-         const lesParametres = $lesParametres;
-    </script>
-    
+// Récupération des paramètres pour les informations
+$lesParametresInfo = json_encode(Information::getConfig());
+
+// Récupération des paramètres pour les fichiers PDF
+$lesParametresFichier = json_encode(FichierPDF::getConfig(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+// Récupération des fichiers PDF
+$lesFichiers = json_encode(FichierPDF::getAll(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+$head = <<<HTML
+<script src='/composant/tinymce/tinymce.min.js' referrerpolicy='origin'></script>
+<script>
+const lesParametresInfo = $lesParametresInfo;
+const lesParametresFichier = $lesParametresFichier;
+const lesFichiers = $lesFichiers;
+</script>
 HTML;
 
 require RACINE . '/include/interface.php';

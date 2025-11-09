@@ -6,6 +6,7 @@
 
 /* global lesinformations, lesParametres */
 let informationCourante = null;
+let informationASupprimer = null;
 
 // -----------------------------------------------------------------------------------
 // Fonctions utilitaires simplifiées
@@ -30,12 +31,6 @@ function messageBox(message, type = 'info') {
             alertDiv.remove();
         }
     }, 5000);
-}
-
-function confirmer(callback, message) {
-    if (confirm(message)) {
-        callback();
-    }
 }
 
 function corriger(champ, message) {
@@ -89,6 +84,90 @@ function appelAjax(options) {
 }
 
 // -----------------------------------------------------------------------------------
+// Fonctions de suppression avec msgDiv
+// -----------------------------------------------------------------------------------
+
+function supprimerInformation() {
+    if (!informationASupprimer) return;
+
+    const { id, elementListe, titre } = informationASupprimer;
+
+    appelAjax({
+        url: 'ajax/supprimer.php',
+        data: { id: id },
+        success: (reponse) => {
+            // 1. Supprimer visuellement
+            if (elementListe) {
+                elementListe.remove();
+            }
+
+            // 2. Afficher un message de confirmation
+            const msgDiv = document.getElementById('msg');
+            if (msgDiv) {
+                msgDiv.innerHTML = '<div class="alert alert-success">Information supprimée avec succès</div>';
+                setTimeout(() => {
+                    msgDiv.innerHTML = '';
+                }, 3000);
+            }
+
+            // 3. Mettre à jour les données
+            const index = lesinformations.findIndex(info => info.id === id);
+            if (index !== -1) {
+                lesinformations.splice(index, 1);
+            }
+
+            // 4. Mettre à jour les statistiques
+            afficherStatistiques();
+
+            // 5. Si l'information courante était celle supprimée, la vider
+            if (informationCourante && informationCourante.id === id) {
+                informationCourante = null;
+                afficherInformationCourante();
+            }
+
+            // 6. Réinitialiser
+            informationASupprimer = null;
+        },
+        error: (error) => {
+            const msgDiv = document.getElementById('msg');
+            if (msgDiv) {
+                msgDiv.innerHTML = `<div class="alert alert-danger">Erreur lors de la suppression : ${error}</div>`;
+            }
+            informationASupprimer = null;
+        }
+    });
+}
+
+function annulerSuppression() {
+    informationASupprimer = null;
+    const msgDiv = document.getElementById('msg');
+    if (msgDiv) {
+        msgDiv.innerHTML = '';
+    }
+}
+
+function demanderConfirmationSuppression(id, elementListe, titre) {
+    informationASupprimer = { id, elementListe, titre };
+
+    const msgDiv = document.getElementById('msg');
+    if (msgDiv) {
+        msgDiv.innerHTML = `
+            <div class="alert alert-warning">
+                Êtes-vous sûr de vouloir supprimer "${titre}" ?
+                <div class="mt-2">
+                    <button class="btn btn-danger btn-sm" onclick="window.supprimerInformation()">
+                        ✓ Confirmer
+                    </button>
+                    <button class="btn btn-secondary btn-sm ms-1" onclick="window.annulerSuppression()">
+                        ✗ Annuler
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// -----------------------------------------------------------------------------------
 // Fonctions d'affichage
 // -----------------------------------------------------------------------------------
 
@@ -108,6 +187,15 @@ function afficherStatistiques() {
         nbTotal.innerText = '0';
         nbPubliques.innerText = '0';
         nbPrivees.innerText = '0';
+    }
+}
+
+function configurerBoutonDocuments() {
+    const btnListeDocuments = document.getElementById('btn-liste-documents');
+
+    if (informationCourante && btnListeDocuments) {
+        // Mettre à jour le href avec l'ID de l'information
+        btnListeDocuments.href = `listedocument.php?idInformation=${informationCourante.id}`;
     }
 }
 
@@ -154,33 +242,11 @@ function remplirMenuDeroulant() {
         btnModifier.textContent = 'Modifier';
         btnModifier.onclick = () => activerModeEdition(info);
 
-        const supprimer = () => {
-            appelAjax({
-                url: 'ajax/supprimer.php',
-                data: {
-                    id: info.id
-                },
-                success: (reponse) => {
-                    // 1. Supprimer visuellement
-                    elementListe.remove();
-
-                    setTimeout(() => {
-                        location.reload();
-                    }, 500);
-                },
-                error: (error) => {
-                    messageBox("Erreur lors de la suppression: " + error, "error");
-                }
-            });
-        };
-
-        const actionSupprimer = () => confirmer(supprimer, `Êtes-vous sûr de vouloir supprimer "${info.titre}" ?`);
-
-        // Bouton Supprimer
+        // Bouton Supprimer avec confirmation msgDiv
         const btnSupprimer = document.createElement('button');
         btnSupprimer.className = 'btn btn-outline-danger btn-sm';
         btnSupprimer.innerHTML = '×';
-        btnSupprimer.onclick = actionSupprimer;
+        btnSupprimer.onclick = () => demanderConfirmationSuppression(info.id, elementListe, info.titre);
 
         // Ajouter les boutons au container
         containerBoutons.appendChild(btnVoir);
@@ -223,7 +289,9 @@ function afficherInformationCourante() {
 
     if (titreInfo) titreInfo.textContent = informationCourante.titre;
     if (auteurInfo) auteurInfo.textContent = informationCourante.auteur;
-    if (contenuInfo) contenuInfo.textContent = informationCourante.contenu;
+
+    // CORRECTION : Utiliser innerHTML au lieu de textContent pour afficher les images et le HTML
+    if (contenuInfo) contenuInfo.innerHTML = informationCourante.contenu;
 
     if (badge) {
         badge.textContent = informationCourante.type;
@@ -231,6 +299,9 @@ function afficherInformationCourante() {
     }
 
     container.style.display = 'block';
+
+    // Configurer le bouton de liste des documents
+    configurerBoutonDocuments();
 }
 
 function selectionnerInformation(id) {
@@ -280,10 +351,10 @@ function activerModeEdition(info) {
                       rows="3" placeholder="Contenu">${info.contenu}</textarea>
         </div>
         <div class="btn-group">
-            <button class="btn btn-success btn-sm" onclick="sauvegarderModification(${info.id})">
+            <button class="btn btn-success btn-sm" onclick="window.sauvegarderModification(${info.id})">
                 ✓ Sauvegarder
             </button>
-            <button class="btn btn-secondary btn-sm" onclick="annulerEdition(${info.id})">
+            <button class="btn btn-secondary btn-sm" onclick="window.annulerEdition(${info.id})">
                 ✗ Annuler
             </button>
         </div>
@@ -440,3 +511,6 @@ window.validerFormulaireAjout = validerFormulaireAjout;
 window.activerModeEdition = activerModeEdition;
 window.annulerEdition = annulerEdition;
 window.sauvegarderModification = sauvegarderModification;
+window.supprimerInformation = supprimerInformation;
+window.annulerSuppression = annulerSuppression;
+window.demanderConfirmationSuppression = demanderConfirmationSuppression;

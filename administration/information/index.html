@@ -9,6 +9,9 @@
 <body>
 <div class="container mt-4">
 
+    <!-- Zone de messages -->
+    <div id="msg"></div>
+
     <!-- Statistiques -->
     <div class="row g-3 mb-4">
         <div class="col-md-4 col-6">
@@ -42,7 +45,7 @@
         </div>
     </div>
 
-    <!-- Menu déroulant avec boutons de suppression -->
+
     <div class="mb-3">
         <label class="form-label">Liste des informations:</label>
         <div id="liste-informations" class="list-group">
@@ -51,6 +54,7 @@
         <p id="message-vide" style="display: none; color: red;">Aucune information disponible</p>
     </div>
 
+
     <!-- Bouton d'action -->
     <div class="mb-3">
         <div class="d-flex justify-content-between mb-3">
@@ -58,13 +62,20 @@
         </div>
     </div>
 
+
+
     <!-- Affichage de l'information sélectionnée -->
     <div id="information-courante" style="display: none;">
         <p><strong>Titre:</strong> <span id="titre-info"></span></p>
-        <p><strong>Auteur:</strong> <span id="auteur-info"></span></p>
+        <p><strong>Auteur :</strong> <span id="auteur-info"></span></p>
         <p><strong>Type:</strong> <span id="badge-type" class="badge"></span></p>
         <p><strong>Contenu:</strong></p>
         <div id="contenu-info"></div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-3">
+                <a href="listedocument.php" id="btn-liste-documents" class="btn btn-outline-danger mb-3">Liste documents</a>
+            </div>
+        </div>
     </div>
 
 </div>
