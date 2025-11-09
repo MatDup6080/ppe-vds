@@ -96,9 +96,9 @@ class Information extends Table
      */
     public static function getInformation() {
         if (isset($_SESSION['membre'])) {
-            $sql = "SELECT id, type, titre, contenu, auteur,date_creation FROM information;";
+            $sql = "SELECT id, type, titre, contenu, auteur,date_creation , date_format(date_creation, '%d/%m/%y') as datefr FROM information;";
         } else {
-            $sql = "SELECT id, type, titre, contenu, auteur,date_creation FROM information WHERE type = 'publique';";
+            $sql = "SELECT id, type, titre, contenu, auteur,date_creation , date_format(date_creation, '%d/%m/%y') as datefr FROM information WHERE type = 'publique';";
         }
 
         $select = new Select();
@@ -142,6 +142,16 @@ class Information extends Table
 
         return $cmd->execute();
     }
+    public static function getInformationById(int $id): ?array
+    {
+        $sql = "SELECT id, type, titre, contenu, auteur, date_creation 
+                FROM information 
+                WHERE id = :id";
+
+        $select = new Select();
+        return $select->getRow($sql, ['id' => $id]);
+    }
+
     /**
      * Récupère la configuration
      *
