@@ -7,19 +7,40 @@ require $_SERVER['DOCUMENT_ROOT'] . '/include/autoload.php';
 $titre = "Site du VDS";
 
 // Chargement des derniers classements présents dans le répertoire 'data/classement'
-$lesClassements = json_encode(Classement::getAll());
+$lesClassements = Classement::getAll();
+$lesClassementsJson = json_encode($lesClassements);
 
 // Prochaine édition des 4 saisons
-$prochaineEdition = json_encode(Epreuve::getProchaineEpreuve());
+$prochaineEdition = Epreuve::getProchaineEpreuve();
+$prochaineEditionJson = json_encode($prochaineEdition);
 
-$informations = json_encode(Information::getInformations());
+// Récupérer les informations avec leurs documents
+$informationsAvecDocuments = [];
+$informationsBrutes = Information::getInformation();
+
+foreach ($informationsBrutes as $info) {
+    // Pour chaque information, récupérer ses documents associés
+    $documents = DocumentInformation::getDocumentsByInformation($info['id']);
+    $informationsAvecDocuments[] = [
+        'id' => $info['id'],
+        'type' => $info['type'],
+        'titre' => $info['titre'],
+        'contenu' => $info['contenu'],
+        'auteur' => $info['auteur'],
+        'date_creation' => $info['date_creation'],
+        'datefr' => $info['datefr'] ?? '',
+        'documents' => $documents // Ajout des documents associés
+    ];
+}
+
+$informationsJson = json_encode($informationsAvecDocuments);
 
 // transmission des données à l'interface
 $head = <<<HTML
     <script>
-        const prochaineEdition = $prochaineEdition;
-        const lesClassements = $lesClassements;
-        const informations = $informations;
+        const prochaineEdition = $prochaineEditionJson;
+        const lesClassements = $lesClassementsJson;
+        const informations = $informationsJson;
     </script>
 HTML;
 

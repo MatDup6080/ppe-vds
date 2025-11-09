@@ -40,12 +40,50 @@ initialiserToutesLesCartes();
 for (const element of informations) {
     let div = document.createElement('div');
     div.classList.add('information-item');
-    div.innerHTML = `<h3>${element.titre}</h3><p>${element.contenu}</p><small>Par ${element.auteur}</small>`;
+
+    // Contenu de l'information
+    let contenuHTML = `
+        <h3>${element.titre}</h3>
+        <p>${element.contenu}</p>
+        <small>Par ${element.auteur}</small>
+        <small>le ${element.date_creation}</small>
+    `;
+
+    // Ajouter les documents associés s'ils existent
+    if (element.documents && element.documents.length > 0) {
+        contenuHTML += `<div class="documents-associes" style="margin-top: 10px;">`;
+        contenuHTML += `<strong>Documents associés :</strong><br>`;
+
+        element.documents.forEach(document => {
+            contenuHTML += `
+                <a href="/afficherdocumentinformation.php?id=${document.id}" 
+                   target="_blank" 
+                   class="lien-document" 
+                   style="display: block; margin: 5px 0;">
+                   📄 ${document.titre}
+                </a>
+            `;
+        });
+
+        contenuHTML += `</div>`;
+    }
+
+    div.innerHTML = contenuHTML;
 
     // Si l'information est privée, l'ajouter dans la section privée
     if (element.type === 'privee') {
-        // Afficher la section privée si elle était cachée
-        document.getElementById('sectionPrivee').style.display = 'block';
+        // Vérifier si la section privée existe, sinon la créer
+        let sectionPrivee = document.getElementById('sectionPrivee');
+        if (!sectionPrivee) {
+            sectionPrivee = document.createElement('div');
+            sectionPrivee.id = 'sectionPrivee';
+            sectionPrivee.classList.add('card', 'mb-1');
+            sectionPrivee.innerHTML = `
+                <div class="card-header entete">Informations Privées</div>
+                <div id="informationPrivee" style="padding: 10px;"></div>
+            `;
+            information.parentNode.insertBefore(sectionPrivee, information.nextSibling);
+        }
         document.getElementById('informationPrivee').appendChild(div);
     } else {
         // Information publique
