@@ -51,14 +51,14 @@ function afficherDocuments(data) {
     data.forEach(document => {
         const tr = lesLignes.insertRow();
 
-        // Cellule 1 : Bouton suppression
+        //  Bouton suppression
         let td = tr.insertCell();
         const btnSupprimer = creerBoutonSuppression(() => confirmer(() => supprimerDocument(document.id)));
         td.appendChild(btnSupprimer);
         td.style.width = "30px";
         td.style.textAlign = "center";
 
-        // Cellule 2 : Lien du document
+     // Lien du document
         td = tr.insertCell();
 
         let contenuHTML = `
